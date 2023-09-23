@@ -14,7 +14,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
-//  "reflect"
+	//  "reflect"
+	"io/ioutil"
+	"regexp"
 
 	"github.com/vladimirvivien/go4vl/device"
 	"github.com/vladimirvivien/go4vl/v4l2"
@@ -261,8 +263,6 @@ func main() {
 		}
 	}()
 
-
-
 	path := "/timelapse/" + dateDir + "/" + devString + "/"
 	err = os.MkdirAll(path, os.ModePerm)
 	if err != nil {
@@ -273,8 +273,29 @@ func main() {
 	go func() {
 		count := 0
 
+		files, err := ioutil.ReadDir(path)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, file := range files {
+			re := regexp.MustCompile("[0-9]+")
+			captureNumber := re.FindAllString(file.Name(), -1)
+			// string to int
+			fileNumber, err := strconv.Atoi(captureNumber[0])
+			if err != nil {
+				// ... handle error
+				panic(err)
+			}
+			fmt.Println(fileNumber)
+			if fileNumber > count {
+				count = fileNumber
+				fmt.Printf("count = %d", count)
+			}
+		}
+
 		for frame := range camera.GetOutput() {
-			fileName := fmt.Sprintf(path + "capture_%06d.png", count)
+			fileName := fmt.Sprintf(path+"capture_%06d.jpg", count)
 			file, err := os.Create(fileName)
 			if err != nil {
 				log.Printf("failed to create file %s: %s", fileName, err)
@@ -289,7 +310,7 @@ func main() {
 				log.Printf("failed to close file %s: %s", fileName, err)
 			}
 			count++
-			time.Sleep(200 * time.Millisecond)
+			time.Sleep(300 * time.Millisecond)
 
 		}
 
