@@ -25,7 +25,7 @@ import (
 var (
 	camera *device.Device
 	frames <-chan []byte
-	fps    uint32 = 30
+	fps    uint32 = 10
 	pixfmt v4l2.FourCCType
 	height = 2448
 	width  = 3264
@@ -163,14 +163,14 @@ func main() {
 	devString := "video" + camera_number
 	devName := "/dev/" + devString
 	frameRate := int(fps)
-	buffSize := 4
+	buffSize := 64
 	defaultDev, err := device.Open(devName)
 	skipDefault := false
 	if err != nil {
 		skipDefault = true
 	}
 
-	dateDir := time.Now().Format("2006.06.15")
+	dateDir := time.Now().Format("2006-02-01")
 
 	format := "yuyv"
 	if !skipDefault {
@@ -290,7 +290,6 @@ func main() {
 			fmt.Println(fileNumber)
 			if fileNumber > count {
 				count = fileNumber
-				fmt.Printf("count = %d", count)
 			}
 		}
 
