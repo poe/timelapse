@@ -211,7 +211,8 @@ func main() {
 		device.WithIOType(v4l2.IOTypeMMAP),
 		device.WithPixFormat(v4l2.PixFormat{PixelFormat: getFormatType(format), Width: uint32(width), Height: uint32(height), Field: v4l2.FieldAny}),
 		device.WithFPS(uint32(frameRate)),
-		device.WithBufferSize(uint32(buffSize)),
+		device.WithBufferSize(uint32(buffSize),
+		device.WithAutoFocus("off")),
 	)
 
 	if err != nil {
