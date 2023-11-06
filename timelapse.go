@@ -170,7 +170,7 @@ func main() {
 		skipDefault = true
 	}
 
-	dateDir := time.Now().Format("2006-02-01")
+	dateDir := time.Now().Format("2006.01.02")
 
 	format := "yuyv"
 	if !skipDefault {
@@ -211,8 +211,7 @@ func main() {
 		device.WithIOType(v4l2.IOTypeMMAP),
 		device.WithPixFormat(v4l2.PixFormat{PixelFormat: getFormatType(format), Width: uint32(width), Height: uint32(height), Field: v4l2.FieldAny}),
 		device.WithFPS(uint32(frameRate)),
-		device.WithBufferSize(uint32(buffSize),
-		device.WithAutoFocus("off")),
+		device.WithBufferSize(uint32(buffSize)),
 	)
 
 	if err != nil {
@@ -295,7 +294,8 @@ func main() {
 		}
 
 		for frame := range camera.GetOutput() {
-			fileName := fmt.Sprintf(path+"capture_%06d.jpg", count)
+			umilis := time.Now().UnixNano() / 1e6
+			fileName := fmt.Sprintf(path+"capture_%06d_%d.jpg", count, umilis)
 			file, err := os.Create(fileName)
 			if err != nil {
 				log.Printf("failed to create file %s: %s", fileName, err)
